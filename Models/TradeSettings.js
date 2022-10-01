@@ -20,6 +20,7 @@ TradeSettings.init(
     active_contract_id: { type: DataTypes.INTEGER, defaultValue: 0 },
     last_profit: { type: DataTypes.REAL, defaultValue: 0 },
     entry: { type: DataTypes.STRING, defaultValue: '' },
+    currency: { type: DataTypes.STRING, defaultValue: 'BTC' },
   },
   { sequelize, modelName: 'trade_settings' }
 );

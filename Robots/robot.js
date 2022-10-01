@@ -271,7 +271,7 @@ async function start() {
         amount: local_stake,
         basis: 'stake',
         contract_type: trade_option === 'buy' ? 'CALL' : 'PUT',
-        currency: 'USD',
+        currency: account.currency,
         duration: expiration,
         duration_unit: 'm',
         symbol: symbol_code,
@@ -288,12 +288,19 @@ async function start() {
         totalLastStakes + (stake * i * payout + totalLastStakes) / payout;
     }
     console.log('Martingale Stake: ' + Math.round(new_stake * 100) / 100);
+    if (account.currency === 'BTC') {
+      return new_stake;
+    }
     return Math.round(new_stake * 100) / 100;
   }
 
   function dynamicStake(balance) {
     if (current_level === 1) {
-      stake = Math.round(0.0158 * balance * 100) / 100;
+      if (account.currency === 'BTC') {
+        stake = 0.0158 * balance;
+      } else {
+        stake = Math.round(0.0158 * balance * 100) / 100;
+      }
       updateRobotSettings(id, 'stake', stake);
     }
   }
