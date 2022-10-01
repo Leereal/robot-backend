@@ -137,6 +137,7 @@ async function start() {
             data.proposal_open_contract.profit
           );
           await updateRobotSettings(id, 'open_trade', false);
+          await updateRobotSettings(id, 'entry', '');
           Socket.emit('closed_trade', { message: 'Trade Closed' });
         } else {
           // We can track the status of our contract as updates to the spot price occur.
@@ -317,7 +318,7 @@ async function start() {
 
 async function startServer() {
   // Open server on port 8080
-  server.listen(8000, () => {
+  server.listen(process.env.APP_SOCKET_PORT, () => {
     console.log('Robot Server started on', server.address().port);
   });
   start();
