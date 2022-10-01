@@ -297,9 +297,9 @@ async function start() {
   function dynamicStake(balance) {
     if (current_level === 1) {
       if (account.currency === 'BTC') {
-        stake = 0.0158 * balance;
+        stake = process.env.APP_MULTIPLIER * balance;
       } else {
-        stake = Math.round(0.0158 * balance * 100) / 100;
+        stake = Math.round(process.env.APP_MULTIPLIER * balance * 100) / 100;
       }
       updateRobotSettings(id, 'stake', stake);
     }
