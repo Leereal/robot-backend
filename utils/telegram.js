@@ -5,7 +5,7 @@ const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 function postSignal(option, symbol, expiration) {
   const message = `
    *❤️ NEW SIGNAL ❤️* 
-  SYMBOY: ${symbol}
+  SYMBOL: ${symbol}
   OPTION: ${option}
   EXPIRATION: ${expiration} minutes
   `;

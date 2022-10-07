@@ -325,7 +325,7 @@ async function start() {
     }
     console.log('Martingale Stake: ' + Math.round(new_stake * 100) / 100);
     if (account.currency === 'BTC') {
-      return new_stake;
+      return new_stake.toFixed(8);
     }
     return Math.round(new_stake * 100) / 100;
   }
@@ -333,7 +333,7 @@ async function start() {
   function dynamicStake(balance) {
     if (current_level === 1) {
       if (account.currency === 'BTC') {
-        stake = process.env.APP_MULTIPLIER * balance;
+        stake = (process.env.APP_MULTIPLIER * balance).toFixed(8);
       } else {
         stake = Math.round(process.env.APP_MULTIPLIER * balance * 100) / 100;
       }
