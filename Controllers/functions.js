@@ -1,3 +1,4 @@
+const Robot = require('../Models/Robot');
 const TradeSettings = require('../Models/TradeSettings');
 const getRobotSettings = async (id) => {
   const settings = await TradeSettings.findOne({ where: { id: id } });
@@ -25,4 +26,32 @@ const updateRobotSettings = async (id, field, value) => {
     console.log(error);
   }
 };
-module.exports = { getRobotSettings, deactivateRobot, updateRobotSettings };
+const startBotServer = async (id) => {
+  try {
+    const robot = await Robot.findOne({
+      where: { id: id },
+    });
+    robot.active = true;
+    await robot.save();
+  } catch (error) {
+    console.log(error);
+  }
+};
+const stopBotServer = async (id) => {
+  try {
+    const robot = await Robot.findOne({
+      where: { id: id },
+    });
+    robot.active = false;
+    await robot.save();
+  } catch (error) {
+    console.log(error);
+  }
+};
+module.exports = {
+  getRobotSettings,
+  deactivateRobot,
+  updateRobotSettings,
+  startBotServer,
+  stopBotServer,
+};

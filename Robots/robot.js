@@ -2,11 +2,14 @@
 const net = require('net');
 const WebSocket = require('ws');
 const { Socket } = require('../utils/socket');
+const { postSignal, postMessage } = require('../utils/telegram');
 require('dotenv').config();
 const {
   getRobotSettings,
   deactivateRobot,
   updateRobotSettings,
+  startBotServer,
+  stopBotServer,
 } = require('../Controllers/functions');
 
 //===============================================Create Server to listen to MT5 Signals==========================//
@@ -66,6 +69,7 @@ async function start() {
     account_settings = await getRobotSettings(id);
     if (!account_settings.active) {
       // Socket.emit('account_status', { message: 'stopped' });
+      postMessage('Quickbucks Robot is not active');
       console.log('Trading is not active on this account');
     } else {
       // console.log('Response: %o', data); // Uncomment this to see full response data.
@@ -75,16 +79,31 @@ async function start() {
       } else if (data.msg_type == 'authorize') {
         console.log('Authorized to buy');
         ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+        postMessage('Quickbucks Robot is activated');
       } else if (data.msg_type == 'balance') {
         await updateRobotSettings(id, 'balance', data.balance.balance);
         Socket.emit('balance', { balance: data.balance.balance });
+        postMessage(
+          `*CURRENT BALANCE: ${account_settings.currency}${data.balance.balance}*
+          *TARGET: ${account_settings.currency}${account_settings.target_percentage}*
+          _Quickbucks Robot_
+          `
+        );
         console.log('Current Balance: %o', data.balance.balance);
         dynamicStake(data.balance.balance);
         if (balance_target(data.balance.balance)) {
           //We must set active to false on the current robot not to close socket
           await deactivateRobot(account.id);
           await updateRobotSettings(id, 'target_reached', true);
+          postMessage('Quickbucks Robot is not active');
           Socket.emit('target_reached', { message: 'Target Reached' });
+          postMessage(
+            `*CURRENT BALANCE: ${account_settings.currency}${data.balance.balance}*
+            *TARGET: ${account_settings.currency}${account_settings.target_percentage}*
+            *🎉🎉TARGET REACHED🎉🎉*
+            _Quickbucks Robot_
+            `
+          );
           ws.close();
         }
       } else if (data.msg_type == 'proposal') {
@@ -139,6 +158,22 @@ async function start() {
           await updateRobotSettings(id, 'open_trade', false);
           await updateRobotSettings(id, 'entry', '');
           Socket.emit('closed_trade', { message: 'Trade Closed' });
+          postMessage(
+            `
+            *PROFIT: ${
+              data.proposal_open_contract.profit > 0
+                ? '🤑' +
+                  account_settings.currency +
+                  data.proposal_open_contract.profit +
+                  '🤑'
+                : '👎' +
+                  account_settings.currency +
+                  data.proposal_open_contract.profit +
+                  '👎'
+            }*      
+            _Quickbucks Robot_
+            `
+          );
         } else {
           // We can track the status of our contract as updates to the spot price occur.
           // console.log(data);
@@ -195,7 +230,7 @@ async function start() {
           symbol_code = symbol;
         }
         if (!open_trade) {
-          place_order(symbol_code, data.trade_option);
+          place_order(symbol_code, data.trade_option, symbol);
         } else {
           const { active_contract_id } = await getRobotSettings(id); //Get the running order id from database
           if (active_contract_id > 0) {
@@ -241,7 +276,7 @@ async function start() {
     ws.send(JSON.stringify({ ping: 1 }));
   }
 
-  function place_order(symbol_code, trade_option) {
+  function place_order(symbol_code, trade_option, symbol) {
     console.log('Open Trade: ' + open_trade);
     let local_stake = stake;
     if (account.martingale === 1) {
@@ -277,6 +312,7 @@ async function start() {
         symbol: symbol_code,
       })
     );
+    postSignal(trade_option === 'buy' ? 'CALL' : 'PUT', symbol, expiration);
   }
 
   function martingale() {
@@ -330,14 +366,16 @@ async function startServer() {
   });
   start();
   await updateRobotSettings(id, 'target_reached', false);
+  await startBotServer(1);
   Socket.emit('server_started', { message: 'Server started Now' });
 }
 
 function stopServer() {
   // Close server on port 8080
-  server.close(function () {
+  server.close(async function () {
     ws.close();
     console.log('Robot Server Stopped');
+    await stopBotServer(1);
     Socket.emit('server_stopped', { message: 'Server started Now' });
   });
 }
