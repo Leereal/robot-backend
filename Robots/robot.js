@@ -3,6 +3,7 @@ const net = require('net');
 const WebSocket = require('ws');
 const { Socket } = require('../utils/socket');
 const { postSignal, postMessage } = require('../utils/telegram');
+const symbols = require('./symbols');
 require('dotenv').config();
 const {
   getRobotSettings,
@@ -208,27 +209,11 @@ async function start() {
       } else if (data.msg_type == 'signal') {
         console.log('Open Trade: ' + open_trade);
         console.log('Signal received:' + new Date().toLocaleString());
-        let symbol_code;
+
         const symbol = data.symbol;
-        if (symbol == 'Volatility 10 Index') symbol_code = 'R_10';
-        else if (symbol == 'Volatility 25 Index') symbol_code = 'R_25';
-        else if (symbol == 'Volatility 50 Index') symbol_code = 'R_50';
-        else if (symbol == 'Volatility 75 Index') symbol_code = 'R_75';
-        else if (symbol == 'Volatility 100 Index') symbol_code = 'R_100';
-        else if (symbol == 'Volatility 10 (1s) Index') symbol_code = '1HZ10V';
-        else if (symbol == 'Volatility 25 (1s) Index') symbol_code = '1HZ25V';
-        else if (symbol == 'Volatility 50 (1s) Index') symbol_code = '1HZ50V';
-        else if (symbol == 'Volatility 75 (1s) Index') symbol_code = '1HZ75V';
-        else if (symbol == 'Volatility 100 (1s) Index') symbol_code = '1HZ100V';
-        // #Jumps
-        else if (symbol == 'Jump 10 Index') symbol_code = 'JD10';
-        else if (symbol == 'Jump 25 Index') symbol_code = 'JD25';
-        else if (symbol == 'Jump 50 Index') symbol_code = 'JD50';
-        else if (symbol == 'Jump 75 Index') symbol_code = 'JD75';
-        else if (symbol == 'Jump 100 Index') symbol_code = 'JD100';
-        else {
-          symbol_code = symbol;
-        }
+        const val = symbols.find((symb) => symb.name === symbol);
+        const symbol_code = val ? val.code : symbol;
+
         if (!open_trade) {
           place_order(symbol_code, data.trade_option, symbol);
         } else {
