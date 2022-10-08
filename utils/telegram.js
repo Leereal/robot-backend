@@ -1,6 +1,10 @@
 const { Telegraf } = require('telegraf');
 require('dotenv').config({ path: require('find-config')('.env') });
-const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+let bot;
+if (process.env.ALLOW_TELEGRAM === 'true') {
+  console.log('Telegram');
+  bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+}
 
 function postSignal(option, symbol, expiration) {
   const message = `
@@ -9,15 +13,20 @@ function postSignal(option, symbol, expiration) {
   OPTION: ${option}
   EXPIRATION: ${expiration} minutes
   `;
-
-  bot.telegram.sendMessage(process.env.TELEGRAM_CHANNEL, message, {
-    parse_mode: 'markdown',
-  });
+  if (process.env.ALLOW_TELEGRAM === 'true') {
+    bot.telegram.sendMessage(process.env.TELEGRAM_CHANNEL, message, {
+      parse_mode: 'markdown',
+    });
+  }
 }
 function postMessage(message) {
-  bot.telegram.sendMessage(process.env.TELEGRAM_CHANNEL, message, {
-    parse_mode: 'markdown',
-  });
+  if (process.env.ALLOW_TELEGRAM === 'true') {
+    bot.telegram.sendMessage(process.env.TELEGRAM_CHANNEL, message, {
+      parse_mode: 'markdown',
+    });
+  }
 }
-bot.launch();
+if (process.env.ALLOW_TELEGRAM === 'true') {
+  bot.launch();
+}
 module.exports = { postSignal, postMessage };
