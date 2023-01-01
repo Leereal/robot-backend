@@ -30,8 +30,8 @@ router.patch('/start', startBot);
 
 router.patch('/stop', stopBot);
 
-router.post('/start-server', authMiddleware, startServer);
-// router.post("/start-server",  startServer);
+// router.post('/start-server', authMiddleware, startServer);
+router.post("/start-server",  startServer);
 
 router.post('/stop-server', stopServer);
 
