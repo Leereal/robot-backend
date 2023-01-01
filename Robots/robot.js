@@ -3,7 +3,7 @@ const net = require('net');
 const WebSocket = require('ws');
 const { Socket } = require('../utils/socket');
 const { postSignal, postMessage } = require('../utils/telegram');
-const symbols = require('./symbols');
+// const { symbols } = require('./symbols');
 require('dotenv').config();
 const {
   getRobotSettings,
@@ -211,6 +211,7 @@ async function start() {
         console.log('Signal received:' + new Date().toLocaleString());
 
         const symbol = data.symbol;
+        const { symbols } = require('./symbols');
         const val = symbols.find((symb) => symb.name === symbol);
         const symbol_code = val ? val.code : symbol;
 

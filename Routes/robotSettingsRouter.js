@@ -1,5 +1,5 @@
-const express = require("express");
-const authMiddleware = require("../middleware/authMiddleware");
+const express = require('express');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 const {
@@ -13,27 +13,28 @@ const {
   all,
   view,
   update,
-} = require("../Controllers/robotSettingsController");
+} = require('../Controllers/robotSettingsController');
 
 //Routes list
-router.get("/", all);
+router.get('/', all);
 
-router.get("/:id", view);
+router.get('/:id', view);
 
-router.patch("/edit/:id", update);
+router.patch('/edit/:id', update);
 
-router.post("/set", setRobot);
+router.post('/set', setRobot);
 
-router.patch("unset/:id", unsetRobot);
+router.patch('unset/:id', unsetRobot);
 
-router.patch("/start", startBot);
+router.patch('/start', startBot);
 
-router.patch("/stop", stopBot);
+router.patch('/stop', stopBot);
 
-router.post("/start-server", authMiddleware, startServer);
+router.post('/start-server', authMiddleware, startServer);
+// router.post("/start-server",  startServer);
 
-router.post("/stop-server", stopServer);
+router.post('/stop-server', stopServer);
 
-router.post("/signal", signalRobot);
+router.post('/signal', signalRobot);
 
 module.exports = router;

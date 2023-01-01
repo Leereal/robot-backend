@@ -39,6 +39,7 @@ const update = async (req, res) => {
     settings.current_level = data.current_level;
     settings.martingale = data.martingale;
     settings.target_percentage = data.target_percentage;
+    settings.currency = data.currency;
     await settings.save();
     res.status(200).json({ settings });
   } catch (error) {

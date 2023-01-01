@@ -18,11 +18,11 @@ const UserSchema = new mongoose.Schema(
     },
     username: {
       type: String,
-      required: [true, 'Email is required'],
+      required: [true, 'Username is required'],
       unique: true,
       dropDups: true,
       trim: true,
-      maxlength: [50, 'Email is too big'],
+      maxlength: [50, 'Username is too big'],
     },
     password: {
       type: String,
